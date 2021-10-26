@@ -22,4 +22,7 @@ php -v
 sudo yum install composer
 
 composer -V
+
+# Build dev env
+composer require --dev barryvdh/laravel-ide-helper
 ```

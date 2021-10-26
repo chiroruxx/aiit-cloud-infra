@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\Instance;
 use Illuminate\Database\Seeder;
 
-class DatabaseSeeder extends Seeder
+class InstanceSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->call(InstanceSeeder::class);
+        Instance::factory()->count(5)->create();
     }
 }

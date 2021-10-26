@@ -8,7 +8,7 @@ sudo systemctl start httpd
 sudo systemctl enable httpd
 sudo systemctl status httpd
 
-sudo firewall-cmd --add-service=http --zone=public
+sudo firewall-cmd --add-service=http --zone=public --permanent
 sudo firewall-cmd --reload
 sudo systemctl restart firewalld
 

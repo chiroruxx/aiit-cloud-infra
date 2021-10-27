@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\InstanceController;
+use App\Http\Controllers\PublicKeyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,4 +18,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('1.0')->group(function (): void {
     Route::get('instances', [InstanceController::class, 'list']);
+
+    Route::apiResource('keys', PublicKeyController::class);
 });

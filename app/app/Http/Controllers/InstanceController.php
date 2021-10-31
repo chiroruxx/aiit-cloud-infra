@@ -9,7 +9,7 @@ use Illuminate\Http\JsonResponse;
 
 class InstanceController extends Controller
 {
-    public function list(): JsonResponse
+    public function index(): JsonResponse
     {
         $instances = Instance::all();
 

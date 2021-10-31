@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('1.0')->group(function (): void {
-    Route::get('instances', [InstanceController::class, 'list']);
+    Route::apiResource('instances', InstanceController::class)->only('index');
 
     Route::apiResource('keys', PublicKeyController::class);
 });

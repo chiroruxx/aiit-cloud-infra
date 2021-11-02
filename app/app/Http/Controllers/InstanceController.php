@@ -20,7 +20,10 @@ class InstanceController extends Controller
 
     public function store(): Response
     {
-        CreateInstanceRequestJob::dispatch();
+        $instance = Instance::initialize('dummy');
+        logger('Initialize instance.', ['instance' => $instance->hash, 'status' => $instance->status]);
+
+        CreateInstanceRequestJob::dispatch($instance);
 
         return response('', Response::HTTP_ACCEPTED);
     }

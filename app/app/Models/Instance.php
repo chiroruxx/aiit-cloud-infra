@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 /**
  * App\Models\Instance
@@ -30,7 +31,38 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Instance extends Model
 {
-    use HasFactory;
+    private const STATUS_INITIALIZING = 'initializing';
+    private const STATUS_STARTING = 'starting';
+    private const STATUS_RUNNING = 'running';
 
+    use HasFactory;
+    use Hashable;
+
+    protected $fillable = ['name', 'hash', 'status'];
     protected $hidden = ['id'];
+
+    public static function initialize(string $name): self
+    {
+        return self::create([
+            'name' => $name,
+            'hash' => self::generateActiveHash(),
+            'status' => self::STATUS_INITIALIZING
+        ]);
+    }
+
+    public function start(): self
+    {
+        $this->status = self::STATUS_STARTING;
+        $this->save();
+
+        return $this;
+    }
+
+    public function run(): self
+    {
+        $this->status = self::STATUS_RUNNING;
+        $this->save();
+
+        return $this;
+    }
 }

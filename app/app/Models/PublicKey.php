@@ -29,19 +29,9 @@ use Str;
 class PublicKey extends Model
 {
     use HasFactory;
+    use Hashable;
 
     protected $fillable = ['content', 'hash'];
     // idはRDBとLaravelでしか使用しないのでレスポンスに含めない
     protected $hidden = ['id'];
-
-    public static function generateActiveHash(): string
-    {
-        $hash = Str::random(8);
-
-        if (self::whereHash($hash)->exists()) {
-            return self::generateActiveHash();
-        }
-
-        return $hash;
-    }
 }

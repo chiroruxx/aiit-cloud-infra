@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Jobs\Agent;
 
 use App\Jobs\DataCenterManager\InstanceCreationCompletionJob;
+use App\Models\Instance;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -16,6 +17,10 @@ use RuntimeException;
 class CreateInstanceJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public function __construct(private Instance $instance)
+    {
+    }
 
     public function handle(): void
     {
@@ -32,17 +37,18 @@ class CreateInstanceJob implements ShouldQueue
         $output = null;
         $result_code = null;
 
-        exec(escapeshellcmd(implode(' ', $command)), $output, $result_code);
+        $commandString = escapeshellcmd(implode(' ', $command));
+        logger('Start execute command.', ['command' => $commandString]);
+
+        exec($commandString, $output, $result_code);
+
+        $commandResult = compact('output', 'result_code');
+        logger('Finish execute command.', ['command' => $commandString, 'result' => $commandResult]);
 
         if ($result_code !== 0 || !isset($output[0])) {
-            throw new RuntimeException(
-                'コマンド実行に失敗しました。' .
-                var_export(compact('output', 'result_code'), true)
-            );
+            throw new RuntimeException('コマンド実行に失敗しました。' . var_export($commandResult, true));
         }
 
-        logger('before dispatch');
-        InstanceCreationCompletionJob::dispatch($output[0]);
-        logger('after dispatch');
+        InstanceCreationCompletionJob::dispatch($this->instance, $output[0]);
     }
 }

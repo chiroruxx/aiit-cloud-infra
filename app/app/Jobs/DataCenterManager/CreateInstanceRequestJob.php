@@ -19,6 +19,8 @@ class CreateInstanceRequestJob extends BaseJob
         $instance = $this->instance->start();
         logger('Start instance.', ['instance' => $instance->hash, 'status' => $instance->status]);
 
-        CreateInstanceJob::dispatch($instance)->onQueue('vm1');
+        $vm = 'vm1';
+
+        CreateInstanceJob::dispatch($instance, $vm)->onQueue($vm);
     }
 }

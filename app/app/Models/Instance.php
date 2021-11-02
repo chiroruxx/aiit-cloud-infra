@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use DB;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -58,10 +59,19 @@ class Instance extends Model
         return $this;
     }
 
-    public function run(): self
+    public function run(string $containerId, string $vm): self
     {
         $this->status = self::STATUS_RUNNING;
-        $this->save();
+
+        $container = new Container();
+        $container->container_id = $containerId;
+        $container->vm = $vm;
+        $container->instance()->associate($this);
+
+        DB::transaction(function () use ($container): void {
+            $this->save();
+            $container->save();
+        });
 
         return $this;
     }

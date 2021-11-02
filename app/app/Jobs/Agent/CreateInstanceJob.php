@@ -18,7 +18,7 @@ class CreateInstanceJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(private Instance $instance)
+    public function __construct(private Instance $instance, private string $vm)
     {
     }
 
@@ -49,6 +49,6 @@ class CreateInstanceJob implements ShouldQueue
             throw new RuntimeException('コマンド実行に失敗しました。' . var_export($commandResult, true));
         }
 
-        InstanceCreationCompletionJob::dispatch($this->instance, $output[0]);
+        InstanceCreationCompletionJob::dispatch($this->instance, $output[0], $this->vm);
     }
 }

@@ -7,7 +7,7 @@ namespace App\Http\Controllers;
 use App\Jobs\DataCenterManager\CreateInstanceRequestJob;
 use App\Models\Instance;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 class InstanceController extends Controller
 {
@@ -18,13 +18,13 @@ class InstanceController extends Controller
         return response()->json($instances);
     }
 
-    public function store(): Response
+    public function store(): JsonResponse
     {
         $instance = Instance::initialize('dummy');
         logger('Initialize instance.', ['instance' => $instance->hash, 'status' => $instance->status]);
 
         CreateInstanceRequestJob::dispatch($instance);
 
-        return response('', Response::HTTP_ACCEPTED);
+        return response()->json($instance, Response::HTTP_ACCEPTED);
     }
 }

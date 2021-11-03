@@ -20,7 +20,9 @@ class CreateInstanceRequestJob extends BaseJob
         $instance = $this->instanceHash->start();
         logger('Start instance.', ['instance' => $instance->hash, 'status' => $instance->status]);
 
+        // TODO: VMを残りのリソースを考慮して自動で指定できるようにする
         $vm = 'vm2';
+        // TODO: PublicKeyをユーザが指定できるようにする
         $publicKey = PublicKey::first();
 
         CreateInstanceJob::dispatch($instance->hash, $publicKey->content, $vm)->onQueue($vm);

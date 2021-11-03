@@ -44,6 +44,7 @@ class CreateInstanceJob implements ShouldQueue
 
     private function buildCommand(string $metaDrivePath): string
     {
+        // TODO: ユーザがCPU数やメモリを指定できるようにする
         $command = [
             'docker',
             'run',

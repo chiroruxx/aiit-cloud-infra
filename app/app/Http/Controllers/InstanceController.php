@@ -20,6 +20,7 @@ class InstanceController extends Controller
 
     public function store(): JsonResponse
     {
+        // TODO: インスタンス名をユーザが指定できるようにする
         $instance = Instance::initialize('dummy');
         logger('Initialize instance.', ['instance' => $instance->hash, 'status' => $instance->status]);
 

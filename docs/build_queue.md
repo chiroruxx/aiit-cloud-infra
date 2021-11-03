@@ -2,7 +2,7 @@
 
 ```shell
 # Install redis
-sudo dnf install redis php-pecl-redis 
+sudo dnf install redis php-pecl-redis php-process
 sudo systemctl start redis
 sudo systemctl status redis
 sudo sudo systemctl enable redis
@@ -31,4 +31,19 @@ sudo chown chiro:apache /var/www/html/web/storage/logs/horizon.log
 sudo systemctl start supervisord
 sudo systemctl status supervisord
 sudo systemctl enable supervisord
+
+# Allow remote connect
+sudo firewall-cmd --add-port=6379/tcp --permanent
+sudo firewall-cmd --reload
+sudo systemctl restart firewalld
+
+sudo vim /etc/redis.conf
+
+# bind 127.0.0.1
+bind 0.0.0.0
+
+sudo systemctl restart redis
+sudo systemctl status redis
+
+redis-cli -h 10.10.10.1
 ```

@@ -2,6 +2,57 @@
 
 use Illuminate\Support\Str;
 
+$queueName = env('QUEUE_NAME', '');
+
+$defaults = [
+    "supervisor-{$queueName}" => [
+        'connection' => 'redis',
+        'queue' => [$queueName],
+        'balance' => 'auto',
+        'maxProcesses' => 1,
+        'memory' => 128,
+        'tries' => 1,
+        'nice' => 0,
+    ],
+];
+
+$environments = [
+    'production' => [
+        "supervisor-{$queueName}" => [
+            'maxProcesses' => 10,
+            'balanceMaxShift' => 1,
+            'balanceCooldown' => 3,
+        ],
+    ],
+
+    'local' => [
+        "supervisor-{$queueName}" => [
+            'maxProcesses' => 3,
+        ],
+    ],
+];
+
+if (env('RUN_DCM')) {
+    $defaults['supervisor-dcm'] = [
+        'connection' => 'redis',
+        'queue' => ['data_center_manager'],
+        'balance' => 'auto',
+        'maxProcesses' => 1,
+        'memory' => 128,
+        'tries' => 1,
+        'nice' => 0,
+    ];
+
+    $environments['production']['supervisor-dcm'] = [
+        'maxProcesses' => 10,
+        'balanceMaxShift' => 1,
+        'balanceCooldown' => 3,
+    ];
+    $environments['local']['supervisor-dcm'] = [
+        'maxProcesses' => 3,
+    ];
+}
+
 return [
 
     /*
@@ -164,48 +215,7 @@ return [
     |
     */
 
-    'defaults' => [
-        'supervisor-1' => [
-            'connection' => 'redis',
-            'queue' => ['data_center_manager'],
-            'balance' => 'auto',
-            'maxProcesses' => 1,
-            'memory' => 128,
-            'tries' => 1,
-            'nice' => 0,
-        ],
-        'supervisor-2' => [
-            'connection' => 'redis',
-            'queue' => ['vm1'],
-            'balance' => 'auto',
-            'maxProcesses' => 1,
-            'memory' => 128,
-            'tries' => 1,
-            'nice' => 0,
-        ],
-    ],
+    'defaults' => $defaults,
 
-    'environments' => [
-        'production' => [
-            'supervisor-1' => [
-                'maxProcesses' => 10,
-                'balanceMaxShift' => 1,
-                'balanceCooldown' => 3,
-            ],
-            'supervisor-2' => [
-                'maxProcesses' => 10,
-                'balanceMaxShift' => 1,
-                'balanceCooldown' => 3,
-            ],
-        ],
-
-        'local' => [
-            'supervisor-1' => [
-                'maxProcesses' => 3,
-            ],
-            'supervisor-2' => [
-                'maxProcesses' => 3,
-            ],
-        ],
-    ],
+    'environments' => $environments,
 ];

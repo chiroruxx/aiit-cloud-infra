@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Jobs\Agent;
 
 use App\Jobs\DataCenterManager\InstanceCreationCompletionJob;
-use App\Models\Instance;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -18,7 +17,7 @@ class CreateInstanceJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(private Instance $instance, private string $vm)
+    public function __construct(private string $instance, private string $vm)
     {
     }
 

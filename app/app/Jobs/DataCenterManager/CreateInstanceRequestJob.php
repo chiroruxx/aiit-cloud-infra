@@ -9,18 +9,18 @@ use App\Models\Instance;
 
 class CreateInstanceRequestJob extends BaseJob
 {
-    public function __construct(private Instance $instance)
+    public function __construct(private Instance $instanceHash)
     {
         parent::__construct();
     }
 
     public function handle(): void
     {
-        $instance = $this->instance->start();
+        $instance = $this->instanceHash->start();
         logger('Start instance.', ['instance' => $instance->hash, 'status' => $instance->status]);
 
-        $vm = 'vm1';
+        $vm = 'vm2';
 
-        CreateInstanceJob::dispatch($instance, $vm)->onQueue($vm);
+        CreateInstanceJob::dispatch($instance->hash, $vm)->onQueue($vm);
     }
 }

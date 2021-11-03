@@ -18,16 +18,23 @@ class CreateInstanceJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(private string $instance, private string $publicKey, private string $vm)
+    public function __construct(private string $instance, private string $publicKey, private string $ip, private string $vm)
     {
     }
 
     public function handle(): void
     {
         $metaDrivePath = $this->createMetaDataDrive();
-        $commandString = $this->buildCommand($metaDrivePath);
 
-        $containerId = $this->execCommand($commandString);
+        $buildCommand = $this->buildCreateCommand($metaDrivePath);
+        $buildResult = $this->execCommand($buildCommand);
+        if (!isset($buildResult[0])) {
+            throw new RuntimeException('コンテナIDが見つかりませんでした');
+        }
+        $containerId = $buildResult[0];
+
+        $connectCommand = $this->buildConnectCommand($containerId);
+        $this->execCommand($connectCommand);
 
         InstanceCreationCompletionJob::dispatch($this->instance, $containerId, $this->vm);
     }
@@ -42,7 +49,7 @@ class CreateInstanceJob implements ShouldQueue
         return storage_path("app/{$basePath}");
     }
 
-    private function buildCommand(string $metaDrivePath): string
+    private function buildCreateCommand(string $metaDrivePath): string
     {
         // TODO: ユーザがCPU数やメモリを指定できるようにする
         $command = [
@@ -60,7 +67,21 @@ class CreateInstanceJob implements ShouldQueue
         return implode(' ', $command);
     }
 
-    private function execCommand(string $commandString): string
+    private function buildConnectCommand(string $containerId): string
+    {
+        $command = [
+            'docker',
+            'network',
+            'connect',
+            "--ip={$this->ip}",
+            'mybridge',
+            $containerId,
+        ];
+
+        return implode(' ', $command);
+    }
+
+    private function execCommand(string $commandString): array
     {
         $output = null;
         $result_code = null;
@@ -72,10 +93,13 @@ class CreateInstanceJob implements ShouldQueue
         $commandResult = compact('output', 'result_code');
         logger('Finish execute command.', ['command' => $commandString, 'result' => $commandResult]);
 
-        if ($result_code !== 0 || !isset($output[0])) {
-            throw new RuntimeException('コマンド実行に失敗しました。' . var_export($commandResult, true));
+        if ($result_code !== 0) {
+            $parameters = array_merge(compact('commandString'), $commandResult);
+            throw new RuntimeException(
+                'コマンド実行に失敗しました。' . var_export($parameters, true)
+            );
         }
 
-        return $output[0];
+        return $output;
     }
 }

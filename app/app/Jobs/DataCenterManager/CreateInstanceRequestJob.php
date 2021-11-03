@@ -24,7 +24,9 @@ class CreateInstanceRequestJob extends BaseJob
         $vm = 'vm2';
         // TODO: PublicKeyをユーザが指定できるようにする
         $publicKey = PublicKey::first();
+        // TODO: 自動でIPを指定できるようにする
+        $ip = '10.10.20.10';
 
-        CreateInstanceJob::dispatch($instance->hash, $publicKey->content, $vm)->onQueue($vm);
+        CreateInstanceJob::dispatch($instance->hash, $publicKey->content, $ip, $vm)->onQueue($vm);
     }
 }

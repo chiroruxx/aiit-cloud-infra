@@ -7,7 +7,7 @@ namespace App\Models;
 use DB;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * App\Models\Instance
@@ -18,6 +18,7 @@ use Illuminate\Support\Str;
  * @property string $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Container|null $container
  * @method static \Database\Factories\InstanceFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|Instance newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Instance newQuery()
@@ -42,13 +43,27 @@ class Instance extends Model
     protected $fillable = ['name', 'hash', 'status'];
     protected $hidden = ['id'];
 
-    public static function initialize(string $name): self
+    public function container(): HasOne
     {
-        return self::create([
-            'name' => $name,
-            'hash' => self::generateActiveHash(),
-            'status' => self::STATUS_INITIALIZING
-        ]);
+        return $this->hasOne(Container::class);
+    }
+
+    public static function initialize(string $name, int $cpus, string $memorySize): self
+    {
+        return DB::transaction(function () use ($name, $cpus, $memorySize): self {
+            $instance = self::create([
+                'name' => $name,
+                'hash' => self::generateActiveHash(),
+                'status' => self::STATUS_INITIALIZING
+            ]);
+
+            $instance->container()->create([
+                'cpus' => $cpus,
+                'memory_size' => $memorySize,
+            ]);
+
+            return $instance;
+        });
     }
 
     public function start(): self
@@ -63,14 +78,14 @@ class Instance extends Model
     {
         $this->status = self::STATUS_RUNNING;
 
-        $container = new Container();
-        $container->container_id = $containerId;
-        $container->vm = $vm;
-        $container->instance()->associate($this);
+        $this->container->fill([
+            'container_id' => $containerId,
+            'vm' => $vm,
+        ]);
 
-        DB::transaction(function () use ($container): void {
+        DB::transaction(function (): void {
+            $this->container->save();
             $this->save();
-            $container->save();
         });
 
         return $this;

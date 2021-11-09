@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @property int $id
  * @property int $instance_id
+ * @property int $cpus
+ * @property string $memory_size
  * @property string $vm
  * @property string $container_id
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -22,9 +24,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Container newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Container query()
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereContainerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Container whereCpus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereInstanceId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Container whereMemorySize($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereVm($value)
  * @mixin \Eloquent
@@ -32,6 +36,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Container extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['container_id', 'cpus', 'memory_size', 'vm'];
 
     public function instance(): BelongsTo
     {

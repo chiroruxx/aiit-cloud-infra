@@ -15,9 +15,11 @@ class CreateContainersTable extends Migration
     {
         Schema::create('containers', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('instance_id');
-            $table->string('vm');
-            $table->string('container_id');
+            $table->unsignedBigInteger('instance_id')->unique();
+            $table->unsignedTinyInteger('cpus');
+            $table->string('memory_size');
+            $table->string('vm')->nullable();
+            $table->string('container_id')->nullable();
             $table->timestamps();
 
             $table->unique(['vm', 'container_id']);

@@ -18,8 +18,14 @@ class CreateInstanceJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(private string $instance, private string $publicKey, private string $ip, private string $vm)
-    {
+    public function __construct(
+        private string $instance,
+        private string $publicKey,
+        private string $ip,
+        private string $vm,
+        private int $cpus,
+        private string $memorySize
+    ) {
     }
 
     public function handle(): void
@@ -51,12 +57,13 @@ class CreateInstanceJob implements ShouldQueue
 
     private function buildCreateCommand(string $metaDrivePath): string
     {
-        // TODO: ユーザがCPU数やメモリを指定できるようにする
         $command = [
             'docker',
             'run',
             '-d',
             '--cap-add=SYS_ADMIN',
+            "--cpuset-cpus {$this->cpus}",
+            "--memory={$this->memorySize}",
             '-v',
             '/sys/fs/cgroup:/sys/fs/cgroup:ro',
             '-v',

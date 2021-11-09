@@ -27,6 +27,13 @@ class CreateInstanceRequestJob extends BaseJob
         // TODO: 自動でIPを指定できるようにする
         $ip = '10.10.20.10';
 
-        CreateInstanceJob::dispatch($instance->hash, $publicKey->content, $ip, $vm)->onQueue($vm);
+        CreateInstanceJob::dispatch(
+            $instance->hash,
+            $publicKey->content,
+            $ip,
+            $vm,
+            $instance->container->cpus,
+            $instance->container->memory_size
+        )->onQueue($vm);
     }
 }

@@ -18,7 +18,7 @@ class CreatePublicKeysTable extends Migration
         Schema::create('public_keys', function (Blueprint $table) {
             $table->id();
             $table->string('hash')->unique();
-            $table->string('content');
+            $table->string('content', 1023);
             $table->timestamps();
         });
     }

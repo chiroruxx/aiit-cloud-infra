@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Container|null $container
+ * @property-read int $cpus
  * @method static \Database\Factories\InstanceFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|Instance newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Instance newQuery()
@@ -40,12 +41,19 @@ class Instance extends Model
     use HasFactory;
     use Hashable;
 
+    protected $appends = ['cpus'];
     protected $fillable = ['name', 'hash', 'status'];
-    protected $hidden = ['id'];
+    protected $hidden = ['id', 'container'];
+    protected $with = ['container'];
 
     public function container(): HasOne
     {
         return $this->hasOne(Container::class);
+    }
+
+    public function getCpusAttribute(): int
+    {
+        return $this->container->cpus;
     }
 
     public static function initialize(string $name, int $cpus, string $memorySize): self

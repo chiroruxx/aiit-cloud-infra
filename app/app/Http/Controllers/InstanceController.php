@@ -30,7 +30,6 @@ class InstanceController extends Controller
 
         CreateInstanceRequestJob::dispatch($instance);
 
-        // TODO: レスポンスにメモリサイズなどのコンテナ情報も含めるようにする
         return response()->json($instance, Response::HTTP_ACCEPTED);
     }
 }

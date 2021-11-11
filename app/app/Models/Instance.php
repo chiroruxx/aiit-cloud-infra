@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Container|null $container
  * @property-read int $cpus
+ * @property-read string $memorySize
  * @method static \Database\Factories\InstanceFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|Instance newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Instance newQuery()
@@ -41,7 +42,7 @@ class Instance extends Model
     use HasFactory;
     use Hashable;
 
-    protected $appends = ['cpus'];
+    protected $appends = ['cpus', 'memory_size'];
     protected $fillable = ['name', 'hash', 'status'];
     protected $hidden = ['id', 'container'];
     protected $with = ['container'];
@@ -54,6 +55,11 @@ class Instance extends Model
     public function getCpusAttribute(): int
     {
         return $this->container->cpus;
+    }
+
+    public function getMemorySizeAttribute(): string
+    {
+        return $this->container->memory_size;
     }
 
     public static function initialize(string $name, int $cpus, string $memorySize): self

@@ -22,7 +22,6 @@ class CreateInstanceJob implements ShouldQueue
         private string $instance,
         private string $publicKey,
         private string $ip,
-        private string $vm,
         private int $cpus,
         private string $memorySize
     ) {
@@ -42,7 +41,7 @@ class CreateInstanceJob implements ShouldQueue
         $connectCommand = $this->buildConnectCommand($containerId);
         $this->execCommand($connectCommand);
 
-        InstanceCreationCompletionJob::dispatch($this->instance, $containerId, $this->vm);
+        InstanceCreationCompletionJob::dispatch($this->instance, $containerId);
     }
 
     private function createMetaDataDrive(): string

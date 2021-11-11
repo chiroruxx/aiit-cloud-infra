@@ -8,7 +8,7 @@ use App\Models\Instance;
 
 class InstanceCreationCompletionJob extends BaseJob
 {
-    public function __construct(private string $instanceHash, private string $containerId, private string $vm)
+    public function __construct(private string $instanceHash, private string $containerId)
     {
         parent::__construct();
     }
@@ -16,7 +16,7 @@ class InstanceCreationCompletionJob extends BaseJob
     public function handle(): void
     {
         $instance = Instance::whereHash($this->instanceHash)->firstOrFail();
-        $instance->run($this->containerId, $this->vm);
+        $instance->run($this->containerId);
         logger(
             'Complete instance creation.',
             [

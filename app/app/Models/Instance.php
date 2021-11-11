@@ -101,14 +101,11 @@ class Instance extends Model
         return $this;
     }
 
-    public function run(string $containerId, string $vm): self
+    public function run(string $containerId): self
     {
         $this->status = self::STATUS_RUNNING;
 
-        $this->container->fill([
-            'container_id' => $containerId,
-            'vm' => $vm,
-        ]);
+        $this->container->container_id = $containerId;
 
         DB::transaction(function (): void {
             $this->container->save();

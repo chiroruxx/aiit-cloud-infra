@@ -25,7 +25,12 @@ class InstanceController extends Controller
         $cpus = 1;
         $memorySize = '512m';
 
-        $instance = Instance::initialize($request->input('name') ?? '', $cpus, $memorySize);
+        $instance = Instance::initialize(
+            $request->input('name') ?? '',
+            $request->input('key'),
+            $cpus,
+            $memorySize
+        );
         logger('Initialize instance.', ['instance' => $instance->hash, 'status' => $instance->status]);
 
         CreateInstanceRequestJob::dispatch($instance);

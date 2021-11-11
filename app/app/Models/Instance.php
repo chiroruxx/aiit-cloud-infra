@@ -20,7 +20,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Container|null $container
  * @property-read int $cpus
- * @property-read string $memorySize
+ * @property-read string $key
+ * @property-read string $memory_size
  * @method static \Database\Factories\InstanceFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|Instance newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Instance newQuery()
@@ -42,10 +43,10 @@ class Instance extends Model
     use HasFactory;
     use Hashable;
 
-    protected $appends = ['cpus', 'memory_size'];
+    protected $appends = ['cpus', 'memory_size', 'key'];
     protected $fillable = ['name', 'hash', 'status'];
     protected $hidden = ['id', 'container'];
-    protected $with = ['container'];
+    protected $with = ['container.publicKey'];
 
     public function container(): HasOne
     {
@@ -62,19 +63,31 @@ class Instance extends Model
         return $this->container->memory_size;
     }
 
-    public static function initialize(string $name, int $cpus, string $memorySize): self
+    public function getKeyAttribute(): string
     {
-        return DB::transaction(function () use ($name, $cpus, $memorySize): self {
+        return $this->container->publicKey->hash;
+    }
+
+    public static function initialize(string $instanceName, string $publicKeyHash, int $cpus, string $memorySize): self
+    {
+        $publicKey = PublicKey::whereHash($publicKeyHash)->firstOrFail(['id']);
+
+        $container = new Container();
+        $container->fill([
+            'cpus' => $cpus,
+            'memory_size' => $memorySize,
+        ]);
+        $container->publicKey()->associate($publicKey);
+
+        return DB::transaction(function () use ($instanceName, $container): self {
             $instance = self::create([
-                'name' => $name,
+                'name' => $instanceName,
                 'hash' => self::generateActiveHash(),
                 'status' => self::STATUS_INITIALIZING
             ]);
 
-            $instance->container()->create([
-                'cpus' => $cpus,
-                'memory_size' => $memorySize,
-            ]);
+            $container->instance()->associate($instance);
+            $container->save();
 
             return $instance;
         });

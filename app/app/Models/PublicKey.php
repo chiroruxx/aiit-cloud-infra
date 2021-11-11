@@ -12,9 +12,11 @@ use Str;
  * App\Models\PublicKey
  *
  * @property int $id
+ * @property string $hash
  * @property string $content
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Database\Factories\PublicKeyFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|PublicKey newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|PublicKey newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|PublicKey query()
@@ -24,7 +26,6 @@ use Str;
  * @method static \Illuminate\Database\Eloquent\Builder|PublicKey whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PublicKey whereUpdatedAt($value)
  * @mixin \Eloquent
- * @property string $hash
  */
 class PublicKey extends Model
 {

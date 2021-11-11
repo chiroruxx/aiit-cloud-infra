@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\PublicKey;
 use Illuminate\Database\Seeder;
 
-class DatabaseSeeder extends Seeder
+class PublicKeySeeder extends Seeder
 {
     public function run(): void
     {
-        $this->call([
-            PublicKeySeeder::class,
-            ContainerSeeder::class,
-        ]);
+        PublicKey::factory()->state(['hash' => 'default'])->create();
     }
 }

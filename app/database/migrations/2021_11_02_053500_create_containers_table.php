@@ -16,6 +16,7 @@ class CreateContainersTable extends Migration
         Schema::create('containers', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('instance_id')->unique();
+            $table->unsignedBigInteger('public_key_id');
             $table->unsignedTinyInteger('cpus');
             $table->string('memory_size');
             $table->string('vm')->nullable();
@@ -27,6 +28,12 @@ class CreateContainersTable extends Migration
             $table->foreign('instance_id')
                 ->references('id')
                 ->on('instances')
+                ->restrictOnDelete()
+                ->cascadeOnUpdate();
+
+            $table->foreign('public_key_id')
+                ->references('id')
+                ->on('public_keys')
                 ->restrictOnDelete()
                 ->cascadeOnUpdate();
         });

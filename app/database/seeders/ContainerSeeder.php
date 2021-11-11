@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\Container;
 use Illuminate\Database\Seeder;
 
-class DatabaseSeeder extends Seeder
+class ContainerSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->call([
-            PublicKeySeeder::class,
-            ContainerSeeder::class,
-        ]);
+        Container::factory()->count(3)->create();
     }
 }

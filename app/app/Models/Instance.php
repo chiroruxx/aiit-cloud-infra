@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\ByteSize;
 use DB;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -60,7 +61,7 @@ class Instance extends Model
 
     public function getMemorySizeAttribute(): string
     {
-        return $this->container->memory_size;
+        return (new ByteSize($this->container->memory_size))->getWithUnit();
     }
 
     public function getKeyAttribute(): string
@@ -68,7 +69,7 @@ class Instance extends Model
         return $this->container->publicKey->hash;
     }
 
-    public static function initialize(string $instanceName, string $publicKeyHash, int $cpus, string $memorySize): self
+    public static function initialize(string $instanceName, string $publicKeyHash, int $cpus, int $memorySize): self
     {
         $publicKey = PublicKey::whereHash($publicKeyHash)->firstOrFail(['id']);
 

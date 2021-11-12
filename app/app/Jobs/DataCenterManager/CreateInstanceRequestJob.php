@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Jobs\DataCenterManager;
 
+use App\ByteSize;
 use App\Jobs\Agent\CreateInstanceJob;
 use App\Models\Instance;
 use App\Models\Machine;
@@ -27,12 +28,13 @@ class CreateInstanceRequestJob extends BaseJob
 
         $instance->container->save();
 
+        // Agent は DB にアクセスできないので値をすべて Job に渡す
         CreateInstanceJob::dispatch(
             $instance->hash,
             $this->instance->container->publicKey->content,
             $instance->container->ip,
             $instance->container->cpus,
-            $instance->container->memory_size
+            (new ByteSize($instance->container->memory_size))->getWithUnit(),
         )->onQueue($machine->queue_name);
     }
 

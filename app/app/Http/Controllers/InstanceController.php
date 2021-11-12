@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\ByteSize;
 use App\Http\Requests\InstanceRequest;
 use App\Jobs\DataCenterManager\CreateInstanceRequestJob;
 use App\Models\Instance;
@@ -23,6 +24,7 @@ class InstanceController extends Controller
     {
         // TODO: メモリサイズをユーザが指定できるようにする
         $memorySize = '512m';
+        $memorySize = ByteSize::createWithUnit($memorySize)->getValue();
 
         $instance = Instance::initialize(
             $request->input('name') ?? '',

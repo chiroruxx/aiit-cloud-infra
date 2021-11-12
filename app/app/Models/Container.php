@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $public_key_id
  * @property int|null $machine_id
  * @property int $cpus
- * @property string $memory_size
+ * @property int $memory_size
  * @property string|null $ip
  * @property string|null $container_id
  * @property \Illuminate\Support\Carbon|null $created_at

@@ -19,7 +19,7 @@ class CreateContainersTable extends Migration
             $table->unsignedBigInteger('public_key_id');
             $table->unsignedBigInteger('machine_id')->nullable();
             $table->unsignedTinyInteger('cpus');
-            $table->string('memory_size');
+            $table->unsignedBigInteger('memory_size');
             $table->string('ip')->nullable();
             $table->string('container_id')->nullable();
             $table->timestamps();

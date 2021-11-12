@@ -10,9 +10,13 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->call([
-            PublicKeySeeder::class,
-            ContainerSeeder::class,
-        ]);
+        $this->call(MachineSeeder::class);
+
+        if ($this->command->confirm('ダミーデータを生成しますか？')) {
+            $this->call([
+                PublicKeySeeder::class,
+                ContainerSeeder::class,
+            ]);
+        }
     }
 }

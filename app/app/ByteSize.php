@@ -36,6 +36,10 @@ class ByteSize
 
     public static function validate(string $withUnit): bool
     {
+        if (strlen($withUnit) < 2) {
+            return false;
+        }
+
         [$givenValue, $givenUnit] = str_split($withUnit, strlen($withUnit) - 1);
 
         if (!in_array($givenUnit, array_keys(self::$units), true)) {
@@ -64,5 +68,12 @@ class ByteSize
         }
 
         return '0' . array_key_last(self::$units);
+    }
+
+    public function lessThan(string $withUnit): bool
+    {
+        $another = self::createWithUnit($withUnit);
+
+        return $this->value < $another->value;
     }
 }

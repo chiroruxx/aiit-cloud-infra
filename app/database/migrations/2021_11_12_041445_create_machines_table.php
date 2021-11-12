@@ -13,6 +13,7 @@ class CreateMachinesTable extends Migration
         Schema::create('machines', function (Blueprint $table): void {
             $table->id();
             $table->string('name')->unique();
+            $table->unsignedTinyInteger('max_cpu_count');
             $table->string('ip_range');
             $table->string('queue_name');
             $table->timestamps();

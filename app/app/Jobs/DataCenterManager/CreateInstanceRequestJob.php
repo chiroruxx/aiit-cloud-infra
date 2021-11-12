@@ -20,10 +20,9 @@ class CreateInstanceRequestJob extends BaseJob
         $instance = $this->instance->start();
         logger('Start instance.', ['instance' => $instance->hash, 'status' => $instance->status]);
 
-        // TODO: VMを残りのリソースを考慮して自動で指定できるようにする
-        $machine = Machine::whereName('vm2')->firstOrFail();
-        $instance->container->machine()->associate($machine);
+        $machine = $this->determineMachine();
 
+        $instance->container->machine()->associate($machine);
         $instance->container->setIp();
 
         $instance->container->save();
@@ -35,5 +34,12 @@ class CreateInstanceRequestJob extends BaseJob
             $instance->container->cpus,
             $instance->container->memory_size
         )->onQueue($machine->queue_name);
+    }
+
+    private function determineMachine(): Machine
+    {
+        $cpus = $this->instance->container->cpus;
+
+        return Machine::where('max_cpu_count', '>=', $cpus)->firstOrFail();
     }
 }

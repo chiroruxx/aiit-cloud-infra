@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Dxw\CIDR\IPv4Range;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -13,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *
  * @property int $id
  * @property string $name
+ * @property int $max_cpu_count
  * @property string $ip_range
  * @property string $queue_name
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Machine whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Machine whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Machine whereIpRange($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Machine whereMaxCpuCount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Machine whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Machine whereQueueName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Machine whereUpdatedAt($value)
@@ -34,7 +35,7 @@ class Machine extends Model
 {
     // ランダムデータを作成しないので HasFactory は使用しない
 
-    protected $fillable = ['name', 'ip_range', 'queue_name'];
+    protected $fillable = ['name', 'max_cpu_count', 'ip_range', 'queue_name'];
 
     public function containers(): HasMany
     {

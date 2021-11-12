@@ -21,14 +21,13 @@ class InstanceController extends Controller
 
     public function store(InstanceRequest $request): JsonResponse
     {
-        // TODO: CPU数、メモリサイズをユーザが指定できるようにする
-        $cpus = 1;
+        // TODO: メモリサイズをユーザが指定できるようにする
         $memorySize = '512m';
 
         $instance = Instance::initialize(
             $request->input('name') ?? '',
             $request->input('key'),
-            $cpus,
+            $request->input('cpus') ?? 1,
             $memorySize
         );
         logger('Initialize instance.', ['instance' => $instance->hash, 'status' => $instance->status]);

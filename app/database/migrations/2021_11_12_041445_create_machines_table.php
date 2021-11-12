@@ -14,6 +14,7 @@ class CreateMachinesTable extends Migration
             $table->id();
             $table->string('name')->unique();
             $table->string('ip_range');
+            $table->string('queue_name');
             $table->timestamps();
         });
     }

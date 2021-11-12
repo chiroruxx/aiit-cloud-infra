@@ -14,13 +14,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $instance_id
  * @property int $public_key_id
+ * @property int|null $machine_id
  * @property int $cpus
  * @property string $memory_size
- * @property string $vm
  * @property string $container_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Instance $instance
+ * @property-read \App\Models\Machine|null $machine
  * @property-read \App\Models\PublicKey $publicKey
  * @method static \Database\Factories\ContainerFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|Container newModelQuery()
@@ -31,17 +32,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereInstanceId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Container whereMachineId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereMemorySize($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container wherePublicKeyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Container whereVm($value)
  * @mixin \Eloquent
  */
 class Container extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['container_id', 'cpus', 'memory_size', 'vm'];
+    protected $fillable = ['container_id', 'cpus', 'memory_size'];
 
     public function instance(): BelongsTo
     {
@@ -51,5 +52,10 @@ class Container extends Model
     public function publicKey(): BelongsTo
     {
         return $this->belongsTo(PublicKey::class);
+    }
+
+    public function machine(): BelongsTo
+    {
+        return $this->belongsTo(Machine::class);
     }
 }

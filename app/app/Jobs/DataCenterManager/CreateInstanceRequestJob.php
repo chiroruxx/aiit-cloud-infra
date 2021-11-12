@@ -6,6 +6,7 @@ namespace App\Jobs\DataCenterManager;
 
 use App\Jobs\Agent\CreateInstanceJob;
 use App\Models\Instance;
+use App\Models\Machine;
 
 class CreateInstanceRequestJob extends BaseJob
 {
@@ -20,7 +21,8 @@ class CreateInstanceRequestJob extends BaseJob
         logger('Start instance.', ['instance' => $instance->hash, 'status' => $instance->status]);
 
         // TODO: VMを残りのリソースを考慮して自動で指定できるようにする
-        $instance->container->vm = 'vm2';
+        $machine = Machine::whereName('vm2')->firstOrFail();
+        $instance->container->machine()->associate($machine);
         // TODO: 自動でIPを指定できるようにする
         $ip = '10.10.20.10';
 
@@ -32,6 +34,6 @@ class CreateInstanceRequestJob extends BaseJob
             $ip,
             $instance->container->cpus,
             $instance->container->memory_size
-        )->onQueue($instance->container->vm);
+        )->onQueue($machine->queue_name);
     }
 }

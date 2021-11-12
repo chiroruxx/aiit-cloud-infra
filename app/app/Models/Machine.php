@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property string $name
  * @property string $ip_range
+ * @property string $queue_name
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|Machine newModelQuery()
@@ -21,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Machine whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Machine whereIpRange($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Machine whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Machine whereQueueName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Machine whereUpdatedAt($value)
  * @mixin \Eloquent
  */
@@ -28,5 +30,5 @@ class Machine extends Model
 {
     // ランダムデータを作成しないので HasFactory は使用しない
 
-    protected $fillable = ['name', 'ip_range'];
+    protected $fillable = ['name', 'ip_range', 'queue_name'];
 }

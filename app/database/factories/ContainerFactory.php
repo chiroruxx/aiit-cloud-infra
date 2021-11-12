@@ -23,6 +23,7 @@ class ContainerFactory extends Factory
             'machine_id' => $this->faker->optional->randomElement($machines),
             'cpus' => 1,
             'memory_size' => '512m',
+            'ip' => $this->faker->optional->ipv4,
             'container_id' => $this->faker->optional->sha256,
         ];
     }

@@ -17,7 +17,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $machine_id
  * @property int $cpus
  * @property string $memory_size
- * @property string $container_id
+ * @property string|null $ip
+ * @property string|null $container_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Instance $instance
@@ -32,6 +33,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereInstanceId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Container whereIp($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereMachineId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereMemorySize($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container wherePublicKeyId($value)
@@ -42,7 +44,7 @@ class Container extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['container_id', 'cpus', 'memory_size'];
+    protected $fillable = ['container_id', 'cpus', 'memory_size', 'ip'];
 
     public function instance(): BelongsTo
     {
@@ -57,5 +59,14 @@ class Container extends Model
     public function machine(): BelongsTo
     {
         return $this->belongsTo(Machine::class);
+    }
+
+    public function setIp(): self
+    {
+        $availableIps = $this->machine->getAvailableIps();
+
+        $this->ip = $availableIps[array_rand($availableIps)];
+
+        return $this;
     }
 }

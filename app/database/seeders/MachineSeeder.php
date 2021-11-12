@@ -16,12 +16,12 @@ class MachineSeeder extends Seeder
     {
         Machine::create([
             'name' => 'vm1',
-            'ip_range' => '10.10.10.0/16',
+            'ip_range' => '10.10.10.0/24',
             'queue_name' => 'vm1',
         ]);
         Machine::create([
             'name' => 'vm2',
-            'ip_range' => '10.10.20.0/16',
+            'ip_range' => '10.10.20.0/24',
             'queue_name' => 'vm2',
         ]);
     }

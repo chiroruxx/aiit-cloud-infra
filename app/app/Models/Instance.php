@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Container|null $container
  * @property-read int $cpus
+ * @property-read string|null $ip
  * @property-read string $key
  * @property-read string $memory_size
  * @method static \Database\Factories\InstanceFactory factory(...$parameters)
@@ -44,7 +45,7 @@ class Instance extends Model
     use HasFactory;
     use Hashable;
 
-    protected $appends = ['cpus', 'memory_size', 'key'];
+    protected $appends = ['cpus', 'memory_size', 'key', 'ip'];
     protected $fillable = ['name', 'hash', 'status'];
     protected $hidden = ['id', 'container'];
     protected $with = ['container.publicKey'];
@@ -67,6 +68,16 @@ class Instance extends Model
     public function getKeyAttribute(): string
     {
         return $this->container->publicKey->hash;
+    }
+
+    public function getIpAttribute(): string|null
+    {
+        return $this->container->ip;
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'hash';
     }
 
     public static function initialize(string $instanceName, string $publicKeyHash, int $cpus, int $memorySize): self

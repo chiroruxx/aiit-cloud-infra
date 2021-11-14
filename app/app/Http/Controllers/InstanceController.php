@@ -36,4 +36,9 @@ class InstanceController extends Controller
 
         return response()->json($instance, Response::HTTP_ACCEPTED);
     }
+
+    public function show(Instance $instance): JsonResponse
+    {
+        return response()->json($instance);
+    }
 }

@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('1.0')->group(function (): void {
-    Route::apiResource('instances', InstanceController::class)->only('index', 'store');
+    Route::apiResource('instances', InstanceController::class)->except(['update', 'destroy']);
 
     Route::apiResource('keys', PublicKeyController::class);
 });

@@ -41,6 +41,16 @@ class CreateInstanceJob implements ShouldQueue
         $connectCommand = $this->buildConnectCommand($containerId);
         $this->execCommand($connectCommand);
 
+        // 正常に作動しているか確認する
+        $checkCommand = $this->buildCheckCommand($containerId);
+        $checkResult = $this->execCommand($checkCommand);
+        if (!isset($checkResult[0])) {
+            throw new RuntimeException('コンテナのステータスが見つかりませんでした');
+        }
+        if ($checkResult[0] !== 'running') {
+            throw new RuntimeException('コンテナの起動に失敗しました');
+        }
+
         InstanceCreationCompletionJob::dispatch($this->instance, $containerId);
     }
 
@@ -81,6 +91,18 @@ class CreateInstanceJob implements ShouldQueue
             'connect',
             "--ip={$this->ip}",
             'mybridge',
+            $containerId,
+        ];
+
+        return implode(' ', $command);
+    }
+
+    private function buildCheckCommand(string $containerId): string
+    {
+        $command = [
+            'docker',
+            'inspect',
+            '--format={{.State.Status}}',
             $containerId,
         ];
 

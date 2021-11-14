@@ -41,6 +41,8 @@ class Instance extends Model
     private const STATUS_INITIALIZING = 'initializing';
     private const STATUS_STARTING = 'starting';
     private const STATUS_RUNNING = 'running';
+    private const STATUS_TERMINATING = 'terminating';
+    private const STATUS_TERMINATED = 'terminated';
 
     use HasFactory;
     use Hashable;
@@ -118,6 +120,30 @@ class Instance extends Model
         $this->status = self::STATUS_RUNNING;
 
         $this->container->container_id = $containerId;
+
+        DB::transaction(function (): void {
+            $this->container->save();
+            $this->save();
+        });
+
+        return $this;
+    }
+
+    public function terminate(): self
+    {
+        $this->status = self::STATUS_TERMINATING;
+        $this->save();
+
+        return $this;
+    }
+
+    public function completeTerminate(): self
+    {
+        $this->status = self::STATUS_TERMINATED;
+        $this->container->fill([
+            'container_id' => null,
+            'ip' => null,
+        ]);
 
         DB::transaction(function (): void {
             $this->container->save();

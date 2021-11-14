@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\ByteSize;
 use App\Http\Requests\InstanceRequest;
 use App\Jobs\DataCenterManager\CreateInstanceRequestJob;
+use App\Jobs\DataCenterManager\TerminateInstanceRequestJob;
 use App\Models\Instance;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,5 +41,14 @@ class InstanceController extends Controller
     public function show(Instance $instance): JsonResponse
     {
         return response()->json($instance);
+    }
+
+    public function destroy(Instance $instance): JsonResponse
+    {
+        $instance->terminate();
+
+        TerminateInstanceRequestJob::dispatch($instance);
+
+        return response()->json($instance, Response::HTTP_ACCEPTED);
     }
 }

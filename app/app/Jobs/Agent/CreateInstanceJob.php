@@ -5,19 +5,11 @@ declare(strict_types=1);
 namespace App\Jobs\Agent;
 
 use App\Jobs\DataCenterManager\InstanceCreationCompletionJob;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 use RuntimeException;
 use Storage;
 
-class CreateInstanceJob implements ShouldQueue
+class CreateInstanceJob extends BaseJob
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
     public function __construct(
         private string $instance,
         private string $publicKey,
@@ -42,7 +34,7 @@ class CreateInstanceJob implements ShouldQueue
         $this->execCommand($connectCommand);
 
         // 正常に作動しているか確認する
-        $checkCommand = $this->buildCheckCommand($containerId);
+        $checkCommand = $this->buildGetStatusCommand($containerId);
         $checkResult = $this->execCommand($checkCommand);
         if (!isset($checkResult[0])) {
             throw new RuntimeException('コンテナのステータスが見つかりませんでした');
@@ -66,7 +58,7 @@ class CreateInstanceJob implements ShouldQueue
 
     private function buildCreateCommand(string $metaDrivePath): string
     {
-        $command = [
+        return $this->buildCommand([
             'docker',
             'run',
             '-d',
@@ -78,56 +70,18 @@ class CreateInstanceJob implements ShouldQueue
             '-v',
             "{$metaDrivePath}:/metadata",
             'local/c8-systemd-ssh',
-        ];
-
-        return implode(' ', $command);
+        ]);
     }
 
     private function buildConnectCommand(string $containerId): string
     {
-        $command = [
+        return $this->buildCommand([
             'docker',
             'network',
             'connect',
             "--ip={$this->ip}",
             'mybridge',
             $containerId,
-        ];
-
-        return implode(' ', $command);
-    }
-
-    private function buildCheckCommand(string $containerId): string
-    {
-        $command = [
-            'docker',
-            'inspect',
-            '--format={{.State.Status}}',
-            $containerId,
-        ];
-
-        return implode(' ', $command);
-    }
-
-    private function execCommand(string $commandString): array
-    {
-        $output = null;
-        $result_code = null;
-
-        logger('Start execute command.', ['command' => $commandString]);
-
-        exec(escapeshellcmd($commandString), $output, $result_code);
-
-        $commandResult = compact('output', 'result_code');
-        logger('Finish execute command.', ['command' => $commandString, 'result' => $commandResult]);
-
-        if ($result_code !== 0) {
-            $parameters = array_merge(compact('commandString'), $commandResult);
-            throw new RuntimeException(
-                'コマンド実行に失敗しました。' . var_export($parameters, true)
-            );
-        }
-
-        return $output;
+        ]);
     }
 }

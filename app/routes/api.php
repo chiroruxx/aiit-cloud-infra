@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Controllers\InstanceController;
 use App\Http\Controllers\PublicKeyController;
 use Illuminate\Http\Request;
@@ -17,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('1.0')->group(function (): void {
-    Route::apiResource('instances', InstanceController::class)->except(['update', 'destroy']);
+    Route::apiResource('instances', InstanceController::class)->except(['update']);
 
     Route::apiResource('keys', PublicKeyController::class);
 });

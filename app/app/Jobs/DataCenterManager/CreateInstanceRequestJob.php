@@ -8,6 +8,7 @@ use App\ByteSize;
 use App\Jobs\Agent\CreateInstanceJob;
 use App\Models\Instance;
 use App\Models\Machine;
+use App\Models\MachineStatistic;
 
 class CreateInstanceRequestJob extends BaseJob
 {
@@ -21,7 +22,11 @@ class CreateInstanceRequestJob extends BaseJob
         $instance = $this->instance->start();
         logger('Start instance.', ['instance' => $instance->hash, 'status' => $instance->status]);
 
-        $machine = $this->determineMachine();
+        $machine = MachineStatistic::determineMachine(
+            $this->instance->container->cpus,
+            $this->instance->container->memory_size,
+            $this->instance->container->storage_size,
+        );
 
         $instance->container->machine()->associate($machine);
         $instance->container->setIp();

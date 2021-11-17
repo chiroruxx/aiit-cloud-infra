@@ -19,6 +19,7 @@ class MachineSeeder extends Seeder
             'name' => 'vm1',
             'max_cpu_count' => 2,
             'max_memory_size' => ByteSize::createWithUnit('1024m')->getValue(),
+            'max_storage_size' => ByteSize::createWithUnit('1t')->getValue(),
             'ip_range' => '10.10.10.0/24',
             'queue_name' => 'vm1',
         ]);
@@ -26,6 +27,7 @@ class MachineSeeder extends Seeder
             'name' => 'vm2',
             'max_cpu_count' => 2,
             'max_memory_size' => ByteSize::createWithUnit('1024m')->getValue(),
+            'max_storage_size' => ByteSize::createWithUnit('1t')->getValue(),
             'ip_range' => '10.10.20.0/24',
             'queue_name' => 'vm2',
         ]);

@@ -15,6 +15,7 @@ class CreateMachinesTable extends Migration
             $table->string('name')->unique();
             $table->unsignedTinyInteger('max_cpu_count');
             $table->unsignedBigInteger('max_memory_size');
+            $table->unsignedBigInteger('max_storage_size');
             $table->string('ip_range');
             $table->string('queue_name');
             $table->timestamps();

@@ -9,6 +9,7 @@ use DomainException;
 class ByteSize
 {
     private static array $units = [
+        't' => 1024 ** 4,
         'g' => 1024 ** 3,
         'm' => 1024 ** 2,
         'k' => 1024,

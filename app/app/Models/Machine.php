@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $id
  * @property string $name
  * @property int $max_cpu_count
+ * @property int $max_memory_size
+ * @property int $max_storage_size
  * @property string $ip_range
  * @property string $queue_name
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -26,12 +28,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Machine whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Machine whereIpRange($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Machine whereMaxCpuCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Machine whereMaxMemorySize($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Machine whereMaxStorageSize($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Machine whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Machine whereQueueName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Machine whereUpdatedAt($value)
  * @mixin \Eloquent
- * @property int $max_memory_size
- * @method static \Illuminate\Database\Eloquent\Builder|Machine whereMaxMemorySize($value)
  */
 class Machine extends Model
 {

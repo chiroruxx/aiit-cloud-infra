@@ -36,7 +36,8 @@ class CreateInstanceRequestJob extends BaseJob
         // Agent は DB にアクセスできないので値をすべて Job に渡す
         CreateInstanceJob::dispatch(
             $instance->hash,
-            $this->instance->container->publicKey->content,
+            $instance->container->image->docker_image_name,
+            $instance->container->publicKey->content,
             $instance->container->ip,
             $instance->container->cpus,
             (new ByteSize($instance->container->memory_size))->getWithUnit(),

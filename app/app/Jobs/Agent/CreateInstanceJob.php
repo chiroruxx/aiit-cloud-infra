@@ -12,6 +12,7 @@ class CreateInstanceJob extends BaseJob
 {
     public function __construct(
         private string $instance,
+        private string $image,
         private string $publicKey,
         private string $ip,
         private int $cpus,
@@ -72,7 +73,7 @@ class CreateInstanceJob extends BaseJob
             '/sys/fs/cgroup:/sys/fs/cgroup:ro',
             '-v',
             "{$metaDrivePath}:/metadata",
-            'local/c8-systemd-ssh',
+            $this->image,
         ]);
     }
 

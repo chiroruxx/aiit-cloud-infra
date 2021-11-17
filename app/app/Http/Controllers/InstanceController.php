@@ -28,6 +28,7 @@ class InstanceController extends Controller
 
         $instance = Instance::initialize(
             $request->input('name') ?? '',
+            $request->input('image'),
             $request->input('key'),
             $request->input('cpus') ?? 1,
             ByteSize::createWithUnit($memorySize)->getValue(),

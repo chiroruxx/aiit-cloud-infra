@@ -6,6 +6,7 @@ namespace Database\Factories;
 
 use App\ByteSize;
 use App\Models\Container;
+use App\Models\Image;
 use App\Models\Instance;
 use App\Models\Machine;
 use App\Models\PublicKey;
@@ -17,6 +18,7 @@ class ContainerFactory extends Factory
 
     public function definition(): array
     {
+        $images = Image::pluck('id');
         $machines = Machine::pluck('id');
         $memorySize = "{$this->faker->numberBetween(0, 1024)}m";
         $storageSize = "{$this->faker->numberBetween(100, 200)}g";
@@ -24,6 +26,7 @@ class ContainerFactory extends Factory
         return [
             'instance_id' => Instance::factory(),
             'public_key_id' => PublicKey::factory(),
+            'image_id' => $this->faker->randomElement($images),
             'machine_id' => $this->faker->optional->randomElement($machines),
             'cpus' => 1,
             'memory_size' => ByteSize::createWithUnit($memorySize)->getValue(),

@@ -17,6 +17,7 @@ class InstanceRequest extends FormRequest
 
         return [
             'name' => ['string', 'max:255'],
+            'image' => ['required', 'string', 'max:255', 'exists:images,name'],
             'key' => ['required', 'string', 'max:255', 'exists:public_keys,hash'],
             'cpus' => ['integer', 'min:1', "max:{$maxCpuCount}"],
             'memory' => ['string'],

@@ -47,7 +47,7 @@ class Instance extends Model
     use HasFactory;
     use Hashable;
 
-    protected $appends = ['cpus', 'memory_size', 'key', 'ip'];
+    protected $appends = ['image', 'cpus', 'memory_size', 'key', 'ip'];
     protected $fillable = ['name', 'hash', 'status'];
     protected $hidden = ['id', 'container'];
     protected $with = ['container.publicKey'];
@@ -55,6 +55,11 @@ class Instance extends Model
     public function container(): HasOne
     {
         return $this->hasOne(Container::class);
+    }
+
+    public function getImageAttribute(): string
+    {
+        return $this->container->image->name;
     }
 
     public function getCpusAttribute(): int
@@ -84,20 +89,24 @@ class Instance extends Model
 
     public static function initialize(
         string $instanceName,
+        string $imageName,
         string $publicKeyHash,
         int $cpus,
         int $memorySize,
         int $storageSize
     ): self {
-        $publicKey = PublicKey::whereHash($publicKeyHash)->firstOrFail(['id']);
-
         $container = new Container();
         $container->fill([
             'cpus' => $cpus,
             'memory_size' => $memorySize,
             'storage_size' => $storageSize,
         ]);
+
+        $publicKey = PublicKey::whereHash($publicKeyHash)->firstOrFail(['id']);
         $container->publicKey()->associate($publicKey);
+
+        $image = Image::whereName($imageName)->firstOrFail(['id']);
+        $container->image()->associate($image);
 
         return DB::transaction(function () use ($instanceName, $container): self {
             $instance = self::create([

@@ -17,6 +17,7 @@ class CreateContainersTable extends Migration
             $table->id();
             $table->unsignedBigInteger('instance_id')->unique();
             $table->unsignedBigInteger('public_key_id');
+            $table->unsignedBigInteger('image_id');
             $table->unsignedBigInteger('machine_id')->nullable();
             $table->unsignedTinyInteger('cpus');
             $table->unsignedBigInteger('memory_size');
@@ -36,6 +37,12 @@ class CreateContainersTable extends Migration
             $table->foreign('public_key_id')
                 ->references('id')
                 ->on('public_keys')
+                ->restrictOnDelete()
+                ->cascadeOnUpdate();
+
+            $table->foreign('image_id')
+                ->references('id')
+                ->on('images')
                 ->restrictOnDelete()
                 ->cascadeOnUpdate();
 

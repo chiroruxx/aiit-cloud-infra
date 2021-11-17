@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $instance_id
  * @property int $public_key_id
+ * @property int $image_id
  * @property int|null $machine_id
  * @property int $cpus
  * @property int $memory_size
@@ -22,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $container_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Image $image
  * @property-read \App\Models\Instance $instance
  * @property-read \App\Models\Machine|null $machine
  * @property-read \App\Models\PublicKey $publicKey
@@ -33,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereCpus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Container whereImageId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereInstanceId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereIp($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereMachineId($value)
@@ -51,6 +54,11 @@ class Container extends Model
     public function instance(): BelongsTo
     {
         return $this->belongsTo(Instance::class);
+    }
+
+    public function image(): BelongsTo
+    {
+        return $this->belongsTo(Image::class);
     }
 
     public function publicKey(): BelongsTo

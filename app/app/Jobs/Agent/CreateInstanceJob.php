@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Jobs\Agent;
 
 use App\Jobs\DataCenterManager\InstanceCreationCompletionJob;
+use App\Services\DockerContainerManager;
 use RuntimeException;
 use Storage;
 
@@ -25,27 +26,20 @@ class CreateInstanceJob extends BaseJob
     {
         $metaDrivePath = $this->createMetaDataDrive();
 
-        $buildCommand = $this->buildCreateCommand($metaDrivePath);
-        $buildResult = $this->execCommand($buildCommand);
-        if (!isset($buildResult[0])) {
-            throw new RuntimeException('コンテナIDが見つかりませんでした');
-        }
-        $containerId = $buildResult[0];
+        $container = DockerContainerManager::build(
+            $this->cpus,
+            $this->memorySize,
+            $this->storageSize,
+            $metaDrivePath,
+            $this->image,
+        )
+        ->connectToDockerNetwork($this->ip);
 
-        $connectCommand = $this->buildConnectCommand($containerId);
-        $this->execCommand($connectCommand);
-
-        // 正常に作動しているか確認する
-        $checkCommand = $this->buildGetStatusCommand($containerId);
-        $checkResult = $this->execCommand($checkCommand);
-        if (!isset($checkResult[0])) {
-            throw new RuntimeException('コンテナのステータスが見つかりませんでした');
-        }
-        if ($checkResult[0] !== 'running') {
+        if (!$container->isRunning()) {
             throw new RuntimeException('コンテナの起動に失敗しました');
         }
 
-        InstanceCreationCompletionJob::dispatch($this->instance, $containerId);
+        InstanceCreationCompletionJob::dispatch($this->instance, $container->getId());
     }
 
     private function createMetaDataDrive(): string
@@ -56,36 +50,5 @@ class CreateInstanceJob extends BaseJob
         Storage::disk('local')->put($path, $this->publicKey);
 
         return storage_path("app/{$basePath}");
-    }
-
-    private function buildCreateCommand(string $metaDrivePath): string
-    {
-        return $this->buildCommand([
-            'docker',
-            'run',
-            '-d',
-            '--cap-add=SYS_ADMIN',
-            "--cpuset-cpus {$this->cpus}",
-            "--memory={$this->memorySize}",
-            '--storage-opt',
-            "size={$this->storageSize}",
-            '-v',
-            '/sys/fs/cgroup:/sys/fs/cgroup:ro',
-            '-v',
-            "{$metaDrivePath}:/metadata",
-            $this->image,
-        ]);
-    }
-
-    private function buildConnectCommand(string $containerId): string
-    {
-        return $this->buildCommand([
-            'docker',
-            'network',
-            'connect',
-            "--ip={$this->ip}",
-            'mybridge',
-            $containerId,
-        ]);
     }
 }

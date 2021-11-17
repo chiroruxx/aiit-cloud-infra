@@ -157,9 +157,9 @@ class Instance extends Model
         $this->status = self::STATUS_TERMINATED;
         $this->container->fill([
             'container_id' => null,
-            'machine_id' => null,
             'ip' => null,
         ]);
+        $this->container->machine()->dissociate();
 
         DB::transaction(function (): void {
             $this->container->save();

@@ -15,7 +15,8 @@ class CreateInstanceJob extends BaseJob
         private string $publicKey,
         private string $ip,
         private int $cpus,
-        private string $memorySize
+        private string $memorySize,
+        private string $storageSize
     ) {
     }
 
@@ -65,6 +66,8 @@ class CreateInstanceJob extends BaseJob
             '--cap-add=SYS_ADMIN',
             "--cpuset-cpus {$this->cpus}",
             "--memory={$this->memorySize}",
+            '--storage-opt',
+            "size={$this->storageSize}",
             '-v',
             '/sys/fs/cgroup:/sys/fs/cgroup:ro',
             '-v',

@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $machine_id
  * @property int $cpus
  * @property int $memory_size
+ * @property int $storage_size
  * @property string|null $ip
  * @property string|null $container_id
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -37,6 +38,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereMachineId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereMemorySize($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container wherePublicKeyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Container whereStorageSize($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Container whereUpdatedAt($value)
  * @mixin \Eloquent
  */
@@ -44,7 +46,7 @@ class Container extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['container_id', 'cpus', 'memory_size', 'ip'];
+    protected $fillable = ['container_id', 'cpus', 'memory_size', 'storage_size', 'ip'];
 
     public function instance(): BelongsTo
     {

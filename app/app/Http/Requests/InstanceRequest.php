@@ -20,30 +20,40 @@ class InstanceRequest extends FormRequest
             'key' => ['required', 'string', 'max:255', 'exists:public_keys,hash'],
             'cpus' => ['integer', 'min:1', "max:{$maxCpuCount}"],
             'memory' => ['string'],
+            'storage' => ['string'],
         ];
     }
 
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator): void {
-            if ($validator->errors()->has('memory')) {
-                return;
-            }
-
-            $memory = $this->input('memory');
-            if ($memory === null) {
-                return;
-            }
-
-            if (!ByteSize::validate($memory)) {
-                $validator->errors()->add('memory', 'Given value is invalid.');
-                return;
-            }
-
-            $memory = ByteSize::createWithUnit($memory);
-            if ($memory->lessThan('4m')) {
-                $validator->errors()->add('memory', 'Memory size should be greater than or equals 4m');
-            }
+            $this->validateByteSize(validator: $validator, key: 'memory', min: '4m');
+            $this->validateByteSize(validator: $validator, key: 'storage', min: '100g');
         });
+    }
+
+    private function validateByteSize(Validator $validator, string $key, string $min): void
+    {
+        if ($validator->errors()->has($key)) {
+            return;
+        }
+
+        $input = $this->input($key);
+        if ($input === null) {
+            return;
+        }
+
+        if (!ByteSize::validate($input)) {
+            $validator->errors()->add($key, 'Given value is invalid.');
+            return;
+        }
+
+        $input = ByteSize::createWithUnit($input);
+        if ($input->lessThan($min)) {
+            $validator->errors()->add(
+                $key,
+                ucfirst("{$key} size should be greater than or equals {$min}")
+            );
+        }
     }
 }

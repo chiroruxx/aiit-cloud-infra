@@ -18,13 +18,16 @@ class ContainerFactory extends Factory
     public function definition(): array
     {
         $machines = Machine::pluck('id');
-        $memorySize = "{$this->faker->biasedNumberBetween(0, 1024)}m";
+        $memorySize = "{$this->faker->numberBetween(0, 1024)}m";
+        $storageSize = "{$this->faker->numberBetween(100, 200)}g";
+
         return [
             'instance_id' => Instance::factory(),
             'public_key_id' => PublicKey::factory(),
             'machine_id' => $this->faker->optional->randomElement($machines),
             'cpus' => 1,
             'memory_size' => ByteSize::createWithUnit($memorySize)->getValue(),
+            'storage_size' => ByteSize::createWithUnit($storageSize)->getValue(),
             'ip' => $this->faker->optional->ipv4,
             'container_id' => $this->faker->optional->sha256,
         ];

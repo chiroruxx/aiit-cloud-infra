@@ -35,6 +35,7 @@ class CreateInstanceRequestJob extends BaseJob
             $instance->container->ip,
             $instance->container->cpus,
             (new ByteSize($instance->container->memory_size))->getWithUnit(),
+            (new ByteSize($instance->container->storage_size))->getWithUnit(),
         )->onQueue($machine->queue_name);
     }
 

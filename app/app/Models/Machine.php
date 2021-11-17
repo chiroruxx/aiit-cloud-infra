@@ -30,6 +30,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Machine whereQueueName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Machine whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property int $max_memory_size
+ * @method static \Illuminate\Database\Eloquent\Builder|Machine whereMaxMemorySize($value)
  */
 class Machine extends Model
 {

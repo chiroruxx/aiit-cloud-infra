@@ -24,12 +24,14 @@ class InstanceController extends Controller
     public function store(InstanceRequest $request): JsonResponse
     {
         $memorySize = $request->input('memory') ?? '4m';
+        $storageSize = $request->input('storage') ?? '100g';
 
         $instance = Instance::initialize(
             $request->input('name') ?? '',
             $request->input('key'),
             $request->input('cpus') ?? 1,
-            ByteSize::createWithUnit($memorySize)->getValue()
+            ByteSize::createWithUnit($memorySize)->getValue(),
+            ByteSize::createWithUnit($storageSize)->getValue(),
         );
         logger('Initialize instance.', ['instance' => $instance->hash, 'status' => $instance->status]);
 

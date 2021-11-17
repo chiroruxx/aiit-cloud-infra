@@ -82,14 +82,20 @@ class Instance extends Model
         return 'hash';
     }
 
-    public static function initialize(string $instanceName, string $publicKeyHash, int $cpus, int $memorySize): self
-    {
+    public static function initialize(
+        string $instanceName,
+        string $publicKeyHash,
+        int $cpus,
+        int $memorySize,
+        int $storageSize
+    ): self {
         $publicKey = PublicKey::whereHash($publicKeyHash)->firstOrFail(['id']);
 
         $container = new Container();
         $container->fill([
             'cpus' => $cpus,
             'memory_size' => $memorySize,
+            'storage_size' => $storageSize,
         ]);
         $container->publicKey()->associate($publicKey);
 

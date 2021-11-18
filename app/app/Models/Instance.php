@@ -168,4 +168,10 @@ class Instance extends Model
 
         return $this;
     }
+
+    public function updateName(?string $name): void
+    {
+        $this->name = $name;
+        $this->save();
+    }
 }

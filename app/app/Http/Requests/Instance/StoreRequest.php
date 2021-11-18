@@ -2,27 +2,28 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Instance;
 
 use App\ByteSize;
 use App\Models\Machine;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 
-class InstanceRequest extends FormRequest
+class StoreRequest extends BaseRequest
 {
     public function rules(): array
     {
         $maxCpuCount = Machine::max('max_cpu_count');
 
-        return [
-            'name' => ['string', 'max:255'],
-            'image' => ['required', 'string', 'max:255', 'exists:images,name'],
-            'key' => ['required', 'string', 'max:255', 'exists:public_keys,hash'],
-            'cpus' => ['integer', 'min:1', "max:{$maxCpuCount}"],
-            'memory' => ['string'],
-            'storage' => ['string'],
-        ];
+        return array_merge(
+            parent::rules(),
+            [
+                'image' => ['required', 'string', 'max:255', 'exists:images,name'],
+                'key' => ['required', 'string', 'max:255', 'exists:public_keys,hash'],
+                'cpus' => ['integer', 'min:1', "max:{$maxCpuCount}"],
+                'memory' => ['string'],
+                'storage' => ['string'],
+            ]
+        );
     }
 
     public function withValidator(Validator $validator): void

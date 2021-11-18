@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\ByteSize;
-use App\Http\Requests\InstanceRequest;
+use App\Http\Requests\Instance\StoreRequest;
+use App\Http\Requests\Instance\UpdateRequest;
 use App\Jobs\DataCenterManager\CreateInstanceRequestJob;
 use App\Jobs\DataCenterManager\TerminateInstanceRequestJob;
 use App\Models\Instance;
@@ -21,7 +22,7 @@ class InstanceController extends Controller
         return response()->json($instances);
     }
 
-    public function store(InstanceRequest $request): JsonResponse
+    public function store(StoreRequest $request): JsonResponse
     {
         $memorySize = $request->input('memory') ?? '4m';
         $storageSize = $request->input('storage') ?? '100g';
@@ -39,6 +40,19 @@ class InstanceController extends Controller
         CreateInstanceRequestJob::dispatch($instance);
 
         return response()->json($instance, Response::HTTP_ACCEPTED);
+    }
+
+    public function update(UpdateRequest $request, Instance $instance): Response
+    {
+        if ($request->isMethod('put')) {
+            abort(404);
+        }
+
+        if ($request->has('name')) {
+            $instance->updateName($request->input('name') ?? '');
+        }
+
+        return response()->noContent(Response::HTTP_NO_CONTENT);
     }
 
     public function show(Instance $instance): JsonResponse

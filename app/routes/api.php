@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('1.0')->group(function (): void {
-    Route::apiResource('instances', InstanceController::class)->except(['update']);
+    Route::apiResource('instances', InstanceController::class);
     Route::apiResource('images', ImageController::class)->only(['index']);
     Route::apiResource('keys', PublicKeyController::class);
 });

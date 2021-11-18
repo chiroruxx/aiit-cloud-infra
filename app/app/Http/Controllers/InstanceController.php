@@ -87,6 +87,10 @@ class InstanceController extends Controller
 
     public function destroy(Instance $instance): JsonResponse
     {
+        if (!$instance->canTerminate()) {
+            abort(Response::HTTP_BAD_REQUEST, 'Cannot destroy this instance.');
+        }
+
         $instance = $this->manager->terminate($instance);
 
         TerminateInstanceRequestJob::dispatch($instance);

@@ -149,8 +149,14 @@ class Instance extends Model
         return match ($to) {
             self::STATUS_HALTED => $this->status === self::STATUS_RUNNING,
             self::STATUS_RUNNING => $this->status === self::STATUS_HALTED,
+            self::STATUS_TERMINATING => in_array($this->status, [self::STATUS_RUNNING, self::STATUS_HALTED], true),
             default => throw new LogicException("Status {$to} is not supported."),
         };
+    }
+
+    public function canTerminate(): bool
+    {
+        return $this->canChangeStatusTo(self::STATUS_TERMINATING);
     }
 
     protected function updateStatus(string $status): self

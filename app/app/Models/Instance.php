@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\ByteSize;
-use DB;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -98,124 +97,51 @@ class Instance extends Model
         return 'hash';
     }
 
-    public static function initialize(
-        string $instanceName,
-        string $imageName,
-        string $publicKeyHash,
-        int $cpus,
-        int $memorySize,
-        int $storageSize
-    ): self {
-        $container = new Container();
-        $container->fill([
-            'cpus' => $cpus,
-            'memory_size' => $memorySize,
-            'storage_size' => $storageSize,
+    public static function toInitializing(string $instanceName): self
+    {
+        return self::create([
+            'name' => $instanceName,
+            'hash' => self::generateActiveHash(),
+            'status' => self::STATUS_INITIALIZING
         ]);
-
-        $publicKey = PublicKey::whereHash($publicKeyHash)->firstOrFail(['id']);
-        $container->publicKey()->associate($publicKey);
-
-        $image = Image::whereName($imageName)->firstOrFail(['id']);
-        $container->image()->associate($image);
-
-        return DB::transaction(function () use ($instanceName, $container): self {
-            $instance = self::create([
-                'name' => $instanceName,
-                'hash' => self::generateActiveHash(),
-                'status' => self::STATUS_INITIALIZING
-            ]);
-
-            $container->instance()->associate($instance);
-            $container->save();
-
-            return $instance;
-        });
     }
 
-    public function start(): self
+    public function toStarting(): self
     {
-        $this->status = self::STATUS_STARTING;
-        $this->save();
-
-        return $this;
+        return $this->updateStatus(self::STATUS_STARTING);
     }
 
-    public function run(string $containerId): self
+    public function toRunning(): self
     {
-        $this->status = self::STATUS_RUNNING;
-
-        $this->container->container_id = $containerId;
-
-        DB::transaction(function (): void {
-            $this->container->save();
-            $this->save();
-        });
-
-        return $this;
+        return $this->updateStatus(self::STATUS_RUNNING);
     }
 
-    public function terminate(): self
+    public function toTerminating(): self
     {
-        $this->status = self::STATUS_TERMINATING;
-        $this->save();
-
-        return $this;
+        return $this->updateStatus(self::STATUS_TERMINATING);
     }
 
-    public function completeTerminate(): self
+    public function toTerminated(): self
     {
-        $this->status = self::STATUS_TERMINATED;
-        $this->container->fill([
-            'container_id' => null,
-            'ip' => null,
-        ]);
-        $this->container->machine()->dissociate();
-
-        DB::transaction(function (): void {
-            $this->container->save();
-            $this->save();
-        });
-
-        return $this;
+        return $this->updateStatus(self::STATUS_TERMINATED);
     }
 
-    public function halt(): self
+    public function toHalting(): self
     {
-        $this->status = self::STATUS_HALTING;
-        $this->save();
-
-        return $this;
+        return $this->updateStatus(self::STATUS_HALTING);
     }
 
-    public function completeHalt(): self
+    public function toHalted(): self
     {
-        $this->status = self::STATUS_HALTED;
-        $this->save();
-
-        return $this;
+        return $this->updateStatus(self::STATUS_HALTED);
     }
 
-    public function restart(): self
-    {
-        $this->status = self::STATUS_STARTING;
-        $this->save();
-
-        return $this;
-    }
-
-    public function completeRestart(): self
-    {
-        $this->status = self::STATUS_RUNNING;
-        $this->save();
-
-        return $this;
-    }
-
-    public function updateName(?string $name): void
+    public function updateName(?string $name): self
     {
         $this->name = $name;
         $this->save();
+
+        return $this;
     }
 
     public function canChangeStatusTo(string $to): bool
@@ -225,5 +151,13 @@ class Instance extends Model
             self::STATUS_RUNNING => $this->status === self::STATUS_HALTED,
             default => throw new LogicException("Status {$to} is not supported."),
         };
+    }
+
+    protected function updateStatus(string $status): self
+    {
+        $this->status = $status;
+        $this->save();
+
+        return $this;
     }
 }

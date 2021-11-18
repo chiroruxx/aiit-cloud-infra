@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Jobs\DataCenterManager;
 
-use App\Models\Instance;
+use App\Services\InstanceManager;
 
 class InstanceCreationCompletionJob extends BaseJob
 {
@@ -13,10 +13,10 @@ class InstanceCreationCompletionJob extends BaseJob
         parent::__construct();
     }
 
-    public function handle(): void
+    public function handle(InstanceManager $manager): void
     {
-        $instance = Instance::whereHash($this->instanceHash)->firstOrFail();
-        $instance->run($this->containerId);
+        $instance = $manager->initialized($this->instanceHash, $this->containerId);
+
         logger(
             'Complete instance creation.',
             [

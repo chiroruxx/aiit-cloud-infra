@@ -71,7 +71,63 @@ class Container extends Model
         return $this->belongsTo(Machine::class);
     }
 
-    public function setIp(): self
+    public static function initialize(
+        int $cpus,
+        int $memorySize,
+        int $storageSize,
+        Instance $instance,
+        Image $image,
+        PublicKey $publicKey,
+    ): self {
+        $container = new self();
+        $container->fill([
+            'cpus' => $cpus,
+            'memory_size' => $memorySize,
+            'storage_size' => $storageSize,
+        ]);
+
+        $container->instance()->associate($instance);
+        $container->image()->associate($image);
+        $container->publicKey()->associate($publicKey);
+
+        $container->save();
+
+        return $container;
+    }
+
+    public function setMachineInfo(Machine $machine): self
+    {
+        $this->machine()->associate($machine);
+        $this->setIp();
+
+        $this->save();
+
+        return $this;
+    }
+
+    public function removeDockerContainerInfo(): self
+    {
+        $this->fill([
+            'container_id' => null,
+            'ip' => null,
+        ]);
+
+        $this->machine()->dissociate();
+
+        $this->save();
+
+        return $this;
+    }
+
+    public function setContainerId(string $containerId): self
+    {
+        $this->container_id = $containerId;
+        $this->save();
+
+        return $this;
+    }
+
+    protected function setIp(): self
     {
         $availableIps = $this->machine->getAvailableIps();
 

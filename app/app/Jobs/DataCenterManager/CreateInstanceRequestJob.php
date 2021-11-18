@@ -7,8 +7,7 @@ namespace App\Jobs\DataCenterManager;
 use App\ByteSize;
 use App\Jobs\Agent\CreateInstanceJob;
 use App\Models\Instance;
-use App\Models\Machine;
-use App\Models\MachineStatistic;
+use App\Services\InstanceManager;
 
 class CreateInstanceRequestJob extends BaseJob
 {
@@ -17,21 +16,10 @@ class CreateInstanceRequestJob extends BaseJob
         parent::__construct();
     }
 
-    public function handle(): void
+    public function handle(InstanceManager $manager): void
     {
-        $instance = $this->instance->start();
+        $instance = $manager->start($this->instance);
         logger('Start instance.', ['instance' => $instance->hash, 'status' => $instance->status]);
-
-        $machine = MachineStatistic::determineMachine(
-            $this->instance->container->cpus,
-            $this->instance->container->memory_size,
-            $this->instance->container->storage_size,
-        );
-
-        $instance->container->machine()->associate($machine);
-        $instance->container->setIp();
-
-        $instance->container->save();
 
         // Agent は DB にアクセスできないので値をすべて Job に渡す
         CreateInstanceJob::dispatch(
@@ -42,13 +30,6 @@ class CreateInstanceRequestJob extends BaseJob
             $instance->container->cpus,
             (new ByteSize($instance->container->memory_size))->getWithUnit(),
             (new ByteSize($instance->container->storage_size))->getWithUnit(),
-        )->onQueue($machine->queue_name);
-    }
-
-    private function determineMachine(): Machine
-    {
-        $cpus = $this->instance->container->cpus;
-
-        return Machine::where('max_cpu_count', '>=', $cpus)->firstOrFail();
+        )->onQueue($instance->container->machine->queue_name);
     }
 }

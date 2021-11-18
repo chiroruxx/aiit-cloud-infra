@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Jobs\DataCenterManager;
 
-use App\Models\Instance;
+use App\Services\InstanceManager;
 
 class InstanceHaltCompleteJob extends BaseJob
 {
@@ -13,10 +13,10 @@ class InstanceHaltCompleteJob extends BaseJob
         parent::__construct();
     }
 
-    public function handle(): void
+    public function handle(InstanceManager $manager): void
     {
-        $instance = Instance::whereHash($this->instanceHash)->firstOrFail();
-        $instance->completeHalt();
+        $instance = $manager->halted($this->instanceHash);
+
         logger(
             'Complete instance halt.',
             [

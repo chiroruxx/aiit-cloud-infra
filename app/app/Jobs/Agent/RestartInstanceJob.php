@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Jobs\Agent;
 
-use App\Jobs\DataCenterManager\InstanceHaltCompleteJob;
-use App\Jobs\DataCenterManager\InstanceRestartingCompleteJob;
+use App\Jobs\DataCenterManager\InstanceRestartingCompletionJob;
 use App\Services\DockerContainerManager;
 
 class RestartInstanceJob extends BaseJob
@@ -20,6 +19,6 @@ class RestartInstanceJob extends BaseJob
         $container = app(DockerContainerManager::class, ['containerId' => $this->containerId]);
         $container->restart();
 
-        InstanceRestartingCompleteJob::dispatch($this->instanceHash);
+        InstanceRestartingCompletionJob::dispatch($this->instanceHash);
     }
 }

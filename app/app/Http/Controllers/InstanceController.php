@@ -12,11 +12,17 @@ use App\Jobs\DataCenterManager\HaltInstanceRequestJob;
 use App\Jobs\DataCenterManager\RestartInstanceRequestJob;
 use App\Jobs\DataCenterManager\TerminateInstanceRequestJob;
 use App\Models\Instance;
+use App\Services\InstanceManager;
 use Illuminate\Http\JsonResponse;
+use LogicException;
 use Symfony\Component\HttpFoundation\Response;
 
 class InstanceController extends Controller
 {
+    public function __construct(private InstanceManager $manager)
+    {
+    }
+
     public function index(): JsonResponse
     {
         $instances = Instance::all();
@@ -29,7 +35,7 @@ class InstanceController extends Controller
         $memorySize = $request->input('memory') ?? '4m';
         $storageSize = $request->input('storage') ?? '100g';
 
-        $instance = Instance::initialize(
+        $instance = $this->manager->initialize(
             $request->input('name') ?? '',
             $request->input('image'),
             $request->input('key'),
@@ -51,20 +57,21 @@ class InstanceController extends Controller
         }
 
         if ($request->has('name')) {
-            $instance->updateName($request->input('name') ?? '');
+            $this->manager->update($instance, $request->input('name') ?? '');
         }
 
         if ($request->has('status')) {
             switch ($request->get('status')) {
                 case 'halted':
-                    $instance->halt();
+                    $this->manager->halt($instance);
                     HaltInstanceRequestJob::dispatch($instance);
                     break;
                 case 'running':
-                    $instance->restart();
+                    $this->manager->restart($instance);
                     RestartInstanceRequestJob::dispatch($instance);
+                    break;
                 default:
-                    // do nothing.
+                    throw new LogicException('Request status is invalid.');
             }
 
             return response()->json($instance, Response::HTTP_ACCEPTED);
@@ -80,7 +87,7 @@ class InstanceController extends Controller
 
     public function destroy(Instance $instance): JsonResponse
     {
-        $instance->terminate();
+        $instance = $this->manager->terminate($instance);
 
         TerminateInstanceRequestJob::dispatch($instance);
 

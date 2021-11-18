@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\Jobs\DataCenterManager;
 
-use App\Models\Instance;
+use App\Services\InstanceManager;
 
-class InstanceRestartingCompleteJob extends BaseJob
+class InstanceRestartingCompletionJob extends BaseJob
 {
     public function __construct(private string $instanceHash)
     {
         parent::__construct();
     }
 
-    public function handle(): void
+    public function handle(InstanceManager $manager): void
     {
-        $instance = Instance::whereHash($this->instanceHash)->firstOrFail();
-        $instance->completeRestart();
+        $instance = $manager->restarted($this->instanceHash);
+
         logger(
             'Complete instance restart.',
             [

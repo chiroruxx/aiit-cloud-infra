@@ -8,6 +8,7 @@ use App\ByteSize;
 use App\Http\Requests\Instance\StoreRequest;
 use App\Http\Requests\Instance\UpdateRequest;
 use App\Jobs\DataCenterManager\CreateInstanceRequestJob;
+use App\Jobs\DataCenterManager\HaltInstanceRequestJob;
 use App\Jobs\DataCenterManager\TerminateInstanceRequestJob;
 use App\Models\Instance;
 use Illuminate\Http\JsonResponse;
@@ -52,7 +53,16 @@ class InstanceController extends Controller
             $instance->updateName($request->input('name') ?? '');
         }
 
-        return response()->noContent(Response::HTTP_NO_CONTENT);
+        if ($request->has('status')) {
+            if ($request->get('status') === 'halted') {
+                $instance->halt();
+                HaltInstanceRequestJob::dispatch($instance);
+            }
+
+            return response()->json($instance, Response::HTTP_ACCEPTED);
+        }
+
+        return response()->noContent();
     }
 
     public function show(Instance $instance): JsonResponse

@@ -9,6 +9,7 @@ use DB;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use LogicException;
 
 /**
  * App\Models\Instance
@@ -38,19 +39,29 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  */
 class Instance extends Model
 {
+    use HasFactory;
+    use Hashable;
+
     private const STATUS_INITIALIZING = 'initializing';
     private const STATUS_STARTING = 'starting';
     private const STATUS_RUNNING = 'running';
     private const STATUS_TERMINATING = 'terminating';
     private const STATUS_TERMINATED = 'terminated';
-
-    use HasFactory;
-    use Hashable;
+    private const STATUS_HALTING = 'halting';
+    private const STATUS_HALTED = 'halted';
 
     protected $appends = ['image', 'cpus', 'memory_size', 'key', 'ip'];
     protected $fillable = ['name', 'hash', 'status'];
     protected $hidden = ['id', 'container'];
     protected $with = ['container.publicKey'];
+
+    public static function getChangeableStatuses(): array
+    {
+        return [
+            self::STATUS_HALTED,
+            self::STATUS_RUNNING,
+        ];
+    }
 
     public function container(): HasOne
     {
@@ -169,9 +180,34 @@ class Instance extends Model
         return $this;
     }
 
+    public function halt(): self
+    {
+        $this->status = self::STATUS_HALTING;
+        $this->save();
+
+        return $this;
+    }
+
+    public function completeHalt(): self
+    {
+        $this->status = self::STATUS_HALTED;
+        $this->save();
+
+        return $this;
+    }
+
     public function updateName(?string $name): void
     {
         $this->name = $name;
         $this->save();
+    }
+
+    public function canChangeStatusTo(string $to): bool
+    {
+        return match ($to) {
+            self::STATUS_HALTED => $this->status === self::STATUS_RUNNING,
+            self::STATUS_RUNNING => $this->status === self::STATUS_HALTED,
+            default => throw new LogicException("Status {$to} is not supported."),
+        };
     }
 }

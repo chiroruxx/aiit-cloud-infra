@@ -196,6 +196,22 @@ class Instance extends Model
         return $this;
     }
 
+    public function restart(): self
+    {
+        $this->status = self::STATUS_STARTING;
+        $this->save();
+
+        return $this;
+    }
+
+    public function completeRestart(): self
+    {
+        $this->status = self::STATUS_RUNNING;
+        $this->save();
+
+        return $this;
+    }
+
     public function updateName(?string $name): void
     {
         $this->name = $name;

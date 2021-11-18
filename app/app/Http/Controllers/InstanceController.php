@@ -9,6 +9,7 @@ use App\Http\Requests\Instance\StoreRequest;
 use App\Http\Requests\Instance\UpdateRequest;
 use App\Jobs\DataCenterManager\CreateInstanceRequestJob;
 use App\Jobs\DataCenterManager\HaltInstanceRequestJob;
+use App\Jobs\DataCenterManager\RestartInstanceRequestJob;
 use App\Jobs\DataCenterManager\TerminateInstanceRequestJob;
 use App\Models\Instance;
 use Illuminate\Http\JsonResponse;
@@ -54,9 +55,16 @@ class InstanceController extends Controller
         }
 
         if ($request->has('status')) {
-            if ($request->get('status') === 'halted') {
-                $instance->halt();
-                HaltInstanceRequestJob::dispatch($instance);
+            switch ($request->get('status')) {
+                case 'halted':
+                    $instance->halt();
+                    HaltInstanceRequestJob::dispatch($instance);
+                    break;
+                case 'running':
+                    $instance->restart();
+                    RestartInstanceRequestJob::dispatch($instance);
+                default:
+                    // do nothing.
             }
 
             return response()->json($instance, Response::HTTP_ACCEPTED);

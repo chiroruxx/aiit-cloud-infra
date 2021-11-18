@@ -86,6 +86,19 @@ class DockerContainerManager
         return $this;
     }
 
+    public function restart(): self
+    {
+        $startCommand = $this->buildCommand([
+            'docker',
+            'start',
+            $this->containerId,
+        ]);
+
+        $this->execCommand($startCommand);
+
+        return $this;
+    }
+
     public function remove(): void
     {
         if ($this->isRunning()) {

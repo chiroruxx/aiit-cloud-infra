@@ -25,4 +25,9 @@ class InstanceHaltCompleteJob extends BaseJob
             ]
         );
     }
+
+    protected function getInstanceHash(): string
+    {
+        return $this->instanceHash;
+    }
 }

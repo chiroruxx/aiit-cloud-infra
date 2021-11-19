@@ -8,6 +8,7 @@ use App\Jobs\DataCenterManager\InstanceCreationCompletionJob;
 use App\Services\DockerContainerManager;
 use RuntimeException;
 use Storage;
+use Throwable;
 
 class CreateInstanceJob extends BaseJob
 {
@@ -40,6 +41,11 @@ class CreateInstanceJob extends BaseJob
         }
 
         InstanceCreationCompletionJob::dispatch($this->instance, $container->getId());
+    }
+
+    protected function getInstanceHash(): string
+    {
+        return $this->instance;
     }
 
     private function createMetaDataDrive(): string

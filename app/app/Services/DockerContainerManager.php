@@ -64,7 +64,12 @@ class DockerContainerManager
             $this->containerId,
         ]);
 
-        $this->execCommand($connectCommand);
+        try {
+            $this->execCommand($connectCommand);
+        } catch (RuntimeException $e) {
+            $this->remove();
+            throw $e;
+        }
 
         return $this;
     }
@@ -77,7 +82,12 @@ class DockerContainerManager
             $this->containerId,
         ]);
 
-        $this->execCommand($stopCommand);
+        try {
+            $this->execCommand($stopCommand);
+        } catch (RuntimeException $e) {
+            $this->remove();
+            throw $e;
+        }
 
         if ($this->getStatus() === 'dead') {
             throw new RuntimeException('コンテナの停止に失敗しました');
@@ -94,7 +104,12 @@ class DockerContainerManager
             $this->containerId,
         ]);
 
-        $this->execCommand($startCommand);
+        try {
+            $this->execCommand($startCommand);
+        } catch (RuntimeException $e) {
+            $this->remove();
+            throw $e;
+        }
 
         return $this;
     }

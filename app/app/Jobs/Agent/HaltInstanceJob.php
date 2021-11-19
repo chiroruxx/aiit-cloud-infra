@@ -21,4 +21,9 @@ class HaltInstanceJob extends BaseJob
 
         InstanceHaltCompleteJob::dispatch($this->instanceHash);
     }
+
+    protected function getInstanceHash(): string
+    {
+        return $this->instanceHash;
+    }
 }

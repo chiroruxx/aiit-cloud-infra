@@ -20,4 +20,9 @@ class TerminateInstanceJob extends BaseJob
 
         InstanceTerminationCompleteJob::dispatch($this->instanceHash);
     }
+
+    protected function getInstanceHash(): string
+    {
+        return $this->instanceHash;
+    }
 }

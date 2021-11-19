@@ -32,4 +32,9 @@ class CreateInstanceRequestJob extends BaseJob
             (new ByteSize($instance->container->storage_size))->getWithUnit(),
         )->onQueue($instance->container->machine->queue_name);
     }
+
+    protected function getInstanceHash(): string
+    {
+        return $this->instance->hash;
+    }
 }

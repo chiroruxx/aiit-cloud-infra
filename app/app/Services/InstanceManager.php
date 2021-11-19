@@ -110,11 +110,19 @@ class InstanceManager
     public function restarted(string $instanceHash): Instance
     {
         $instance = Instance::whereHash($instanceHash)->firstOrFail();
+
         return $instance->toRunning();
     }
 
     public function update(Instance $instance, ?string $name): Instance
     {
         return $instance->updateName($name);
+    }
+
+    public function failed(string $instanceHash): Instance
+    {
+        $instance = Instance::whereHash($instanceHash)->firstOrFail();
+
+        return $instance->toFailed();
     }
 }

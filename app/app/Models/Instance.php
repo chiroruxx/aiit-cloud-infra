@@ -48,6 +48,7 @@ class Instance extends Model
     private const STATUS_TERMINATED = 'terminated';
     private const STATUS_HALTING = 'halting';
     private const STATUS_HALTED = 'halted';
+    private const STATUS_FAILED = 'failed';
 
     protected $appends = ['image', 'cpus', 'memory_size', 'key', 'ip'];
     protected $fillable = ['name', 'hash', 'status'];
@@ -134,6 +135,11 @@ class Instance extends Model
     public function toHalted(): self
     {
         return $this->updateStatus(self::STATUS_HALTED);
+    }
+
+    public function toFailed(): self
+    {
+        return $this->updateStatus(self::STATUS_FAILED);
     }
 
     public function updateName(?string $name): self

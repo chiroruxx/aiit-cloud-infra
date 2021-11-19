@@ -32,6 +32,11 @@ class TerminateInstanceRequestJob extends BaseJob
         );
 
         TerminateInstanceJob::dispatch($this->instance->hash, $this->instance->container->container_id)
-        ->onQueue($this->instance->container->machine->queue_name);
+            ->onQueue($this->instance->container->machine->queue_name);
+    }
+
+    protected function getInstanceHash(): string
+    {
+        return $this->instance->hash;
     }
 }

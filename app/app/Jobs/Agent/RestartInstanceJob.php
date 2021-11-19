@@ -21,4 +21,9 @@ class RestartInstanceJob extends BaseJob
 
         InstanceRestartingCompletionJob::dispatch($this->instanceHash);
     }
+
+    protected function getInstanceHash(): string
+    {
+        return $this->instanceHash;
+    }
 }

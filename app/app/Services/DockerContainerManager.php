@@ -29,7 +29,7 @@ class DockerContainerManager
             'run',
             '-d',
             '--cap-add=SYS_ADMIN',
-            "--cpuset-cpus {$cpus}",
+            "--cpus={$cpus}",
             "--memory={$memorySize}",
             '--storage-opt',
             "size={$storageSize}",

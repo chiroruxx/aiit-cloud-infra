@@ -13,11 +13,11 @@ class ImageSeeder extends Seeder
     {
         Image::create([
             'name' => 'centos:8',
-            'docker_image_name' => 'local/c8-systemd-ssh',
+            'docker_image_name' => '10.10.10.1:5000/private/c8-systemd-ssh',
         ]);
         Image::create([
             'name' => 'ubuntu:20',
-            'docker_image_name' => 'local/u20-sshd',
+            'docker_image_name' => '10.10.10.1:5000/private/u20-sshd',
         ]);
     }
 }
